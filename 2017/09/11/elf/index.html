@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="技术," />
+  <meta name="keywords" content="elf," />
 
 
 
@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="可执行文件的e_entry指向C库中的_start，而动态库.so中的进入点指向 call_gmon_start   1234567891011121314151617181920ELF Header:  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00   Class:                             ELF">
-<meta name="keywords" content="技术">
+<meta name="description" content="ELF Header查看ELF Header命令：1readelf -h 1234567891011121314151617181920ELF Header:  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00   Class:                             ELF64  Data:">
+<meta name="keywords" content="elf">
 <meta property="og:type" content="article">
 <meta property="og:title" content="elf 文件讲解">
-<meta property="og:url" content="http://yoursite.com/2017/09/11/elf/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="可执行文件的e_entry指向C库中的_start，而动态库.so中的进入点指向 call_gmon_start   1234567891011121314151617181920ELF Header:  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00   Class:                             ELF">
+<meta property="og:url" content="https://jaguo.github.io/2017/09/11/elf/index.html">
+<meta property="og:site_name" content="Lazzzzzzy">
+<meta property="og:description" content="ELF Header查看ELF Header命令：1readelf -h 1234567891011121314151617181920ELF Header:  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00   Class:                             ELF64  Data:">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-11T07:00:08.457Z">
+<meta property="og:updated_time" content="2017-09-11T12:29:52.040Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="elf 文件讲解">
-<meta name="twitter:description" content="可执行文件的e_entry指向C库中的_start，而动态库.so中的进入点指向 call_gmon_start   1234567891011121314151617181920ELF Header:  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00   Class:                             ELF">
+<meta name="twitter:description" content="ELF Header查看ELF Header命令：1readelf -h 1234567891011121314151617181920ELF Header:  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00   Class:                             ELF64  Data:">
 
 
 
@@ -134,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/09/11/elf/"/>
+  <link rel="canonical" href="https://jaguo.github.io/2017/09/11/elf/"/>
 
 
 
 
 
-  <title>elf 文件讲解 | Hexo</title>
+  <title>elf 文件讲解 | Lazzzzzzy</title>
   
 
 
@@ -176,7 +176,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">Lazzzzzzy</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -212,7 +212,7 @@
       
         
         <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
+          <a href="/categories/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
@@ -222,7 +222,7 @@
       
         
         <li class="menu-item menu-item-archives">
-          <a href="/archives" rel="section">
+          <a href="/archives/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
@@ -232,7 +232,7 @@
       
         
         <li class="menu-item menu-item-tags">
-          <a href="/tags" rel="section">
+          <a href="/tags/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
@@ -273,7 +273,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/11/elf/">
+    <link itemprop="mainEntityOfPage" href="https://jaguo.github.io/2017/09/11/elf/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Guo">
@@ -282,7 +282,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="Lazzzzzzy">
     </span>
 
     
@@ -313,6 +313,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分析/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -340,8 +362,13 @@
       
 
       
-        <p>可执行文件的e_entry指向C库中的_start，而动态库.so中的进入点指向 call_gmon_start  </p>
+        <h1 id="ELF-Header"><a href="#ELF-Header" class="headerlink" title="ELF Header"></a>ELF Header</h1><p>查看<code>ELF Header</code>命令：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">readelf -h</div></pre></td></tr></table></figure></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">ELF Header:</div><div class="line">  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 </div><div class="line">  Class:                             ELF64</div><div class="line">  Data:                              2&apos;s complement, little endian</div><div class="line">  Version:                           1 (current)</div><div class="line">  OS/ABI:                            UNIX - System V</div><div class="line">  ABI Version:                       0</div><div class="line">  Type:                              EXEC (Executable file)</div><div class="line">  Machine:                           Advanced Micro Devices X86-64</div><div class="line">  Version:                           0x1</div><div class="line">  Entry point address:               0x400760</div><div class="line">  Start of program headers:          64 (bytes into file)</div><div class="line">  Start of section headers:          6784 (bytes into file)</div><div class="line">  Flags:                             0x0</div><div class="line">  Size of this header:               64 (bytes)</div><div class="line">  Size of program headers:           56 (bytes)</div><div class="line">  Number of program headers:         9</div><div class="line">  Size of section headers:           64 (bytes)</div><div class="line">  Number of section headers:         31</div><div class="line">  Section header string table index: 28</div></pre></td></tr></table></figure>
+<p>Data：大段模式还是小段模式<br>OS/ABI：系统类型<br>Type：文件类型(可执行文件，可重定向文件，动态链接库文件)<br>Entry point address: 程序入口地址  </p>
+<h1 id="Program-header"><a href="#Program-header" class="headerlink" title="Program header"></a>Program header</h1><p>查看<code>Program header</code>命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">readelf -l</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">Elf file type is EXEC (Executable file)</div><div class="line">Entry point 0x4003e0</div><div class="line">There are 9 program headers, starting at offset 64</div><div class="line"></div><div class="line">Program Headers:</div><div class="line">  Type           Offset             VirtAddr           PhysAddr</div><div class="line">                 FileSiz            MemSiz              Flags  Align</div><div class="line">  PHDR           0x0000000000000040 0x0000000000400040 0x0000000000400040</div><div class="line">                 0x00000000000001f8 0x00000000000001f8  R E    8</div><div class="line">  INTERP         0x0000000000000238 0x0000000000400238 0x0000000000400238</div><div class="line">                 0x000000000000001c 0x000000000000001c  R      1</div><div class="line">      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]</div><div class="line">  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000</div><div class="line">                 0x00000000000006bc 0x00000000000006bc  R E    200000</div><div class="line">  LOAD           0x0000000000000e10 0x0000000000600e10 0x0000000000600e10</div><div class="line">                 0x0000000000000220 0x0000000000000228  RW     200000</div><div class="line">  DYNAMIC        0x0000000000000e28 0x0000000000600e28 0x0000000000600e28</div><div class="line">                 0x00000000000001d0 0x00000000000001d0  RW     8</div><div class="line">  NOTE           0x0000000000000254 0x0000000000400254 0x0000000000400254</div><div class="line">                 0x0000000000000044 0x0000000000000044  R      4</div><div class="line">  GNU_EH_FRAME   0x0000000000000594 0x0000000000400594 0x0000000000400594</div><div class="line">                 0x0000000000000034 0x0000000000000034  R      4</div><div class="line">  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000</div><div class="line">                 0x0000000000000000 0x0000000000000000  RW     10</div><div class="line">  GNU_RELRO      0x0000000000000e10 0x0000000000600e10 0x0000000000600e10</div><div class="line">                 0x00000000000001f0 0x00000000000001f0  R      1</div><div class="line"></div><div class="line"> Section to Segment mapping:</div><div class="line">  Segment Sections...</div><div class="line">   00     </div><div class="line">   01     .interp </div><div class="line">   02     .interp .note.ABI-tag .note.gnu.build-id .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .plt.got .text .fini .rodata .eh_frame_hdr .eh_frame </div><div class="line">   03     .init_array .fini_array .jcr .dynamic .got .got.plt .data .bss </div><div class="line">   04     .dynamic </div><div class="line">   05     .note.ABI-tag .note.gnu.build-id </div><div class="line">   06     .eh_frame_hdr </div><div class="line">   07     </div><div class="line">   08     .init_array .fini_array .jcr .dynamic .got</div></pre></td></tr></table></figure>
+<h1 id="Section-Headers"><a href="#Section-Headers" class="headerlink" title="Section Headers"></a>Section Headers</h1><p>查看<code>Section header</code>命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">readelf -S</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">There are 31 section headers, starting at offset 0x19a8:</div><div class="line"></div><div class="line">Section Headers:</div><div class="line">  [Nr] Name              Type             Address           Offset</div><div class="line">       Size              EntSize          Flags  Link  Info  Align</div><div class="line">  [ 0]                   NULL             0000000000000000  00000000</div><div class="line">       0000000000000000  0000000000000000           0     0     0</div><div class="line">  [ 1] .interp           PROGBITS         0000000000400238  00000238</div><div class="line">       000000000000001c  0000000000000000   A       0     0     1</div><div class="line">  [ 2] .note.ABI-tag     NOTE             0000000000400254  00000254</div><div class="line">       0000000000000020  0000000000000000   A       0     0     4</div><div class="line">  [ 3] .note.gnu.build-i NOTE             0000000000400274  00000274</div><div class="line">       0000000000000024  0000000000000000   A       0     0     4</div><div class="line">  [ 4] .gnu.hash         GNU_HASH         0000000000400298  00000298</div><div class="line">       000000000000001c  0000000000000000   A       5     0     8</div><div class="line">  [ 5] .dynsym           DYNSYM           00000000004002b8  000002b8</div><div class="line">       0000000000000048  0000000000000018   A       6     1     8</div><div class="line">  [ 6] .dynstr           STRTAB           0000000000400300  00000300</div><div class="line">       0000000000000038  0000000000000000   A       0     0     1</div><div class="line">  [ 7] .gnu.version      VERSYM           0000000000400338  00000338</div><div class="line">       0000000000000006  0000000000000002   A       5     0     2</div><div class="line">                                ...</div></pre></td></tr></table></figure>
 
       
     </div>
@@ -359,7 +386,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/技术/" rel="tag"># 技术</a>
+            <a href="/tags/elf/" rel="tag"># elf</a>
           
         </div>
       
@@ -368,22 +395,6 @@
       
       
 
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2017/09/11/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-          </div>
-        </div>
       
 
       
@@ -432,8 +443,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -447,23 +467,32 @@
 
           
             <div class="site-state-item site-state-posts">
-              <a href="/archives">
-                <span class="site-state-item-count">2</span>
+              <a href="/archives/">
+                <span class="site-state-item-count">1</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
 
           
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
 
           
             
             
             <div class="site-state-item site-state-tags">
-              
+              <a href="/tags/index.html">
                 <span class="site-state-item-count">1</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -472,6 +501,19 @@
         
 
         <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jaguo" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
           
         </div>
 
@@ -486,6 +528,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ELF-Header"><span class="nav-number">1.</span> <span class="nav-text">ELF Header</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Program-header"><span class="nav-number">2.</span> <span class="nav-text">Program header</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Section-Headers"><span class="nav-number">3.</span> <span class="nav-text">Section Headers</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -511,15 +569,8 @@
 </div>
 
 
-<div class="powered-by">
-  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
-</div>
-
-<div class="theme-info">
-  主题 -
-  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Pisces
-  </a>
+<div class="copyright">
+  由 Hexo 强力驱动
 </div>
 
 
