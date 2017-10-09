@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Dyninst,Static Instrumentation," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="0x00Dyninst 学习暂时告一段落，学习的成果是为师兄做了一个二进制层面的静态插桩，之后也做了一些性能测试的工作。   0x01主要以代码形式讲解和记录：1234567891011121314151617181920212223242526272829303132333435363738394041int main(int argc, char **argv)&amp;#123;    //首先通过">
+<meta name="keywords" content="Dyninst,Static Instrumentation">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dyninst 小结">
+<meta property="og:url" content="https://jaguo.github.io/2017/10/09/dyninst/index.html">
+<meta property="og:site_name" content="Lazzzzzzy">
+<meta property="og:description" content="0x00Dyninst 学习暂时告一段落，学习的成果是为师兄做了一个二进制层面的静态插桩，之后也做了一些性能测试的工作。   0x01主要以代码形式讲解和记录：1234567891011121314151617181920212223242526272829303132333435363738394041int main(int argc, char **argv)&amp;#123;    //首先通过">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-10-09T06:12:33.631Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dyninst 小结">
+<meta name="twitter:description" content="0x00Dyninst 学习暂时告一段落，学习的成果是为师兄做了一个二进制层面的静态插桩，之后也做了一些性能测试的工作。   0x01主要以代码形式讲解和记录：1234567891011121314151617181920212223242526272829303132333435363738394041int main(int argc, char **argv)&amp;#123;    //首先通过">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jaguo.github.io/2017/10/09/dyninst/"/>
+
+
+
+
+
+  <title>Dyninst 小结 | Lazzzzzzy</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-75324188-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Lazzzzzzy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jaguo.github.io/2017/10/09/dyninst/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Guo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lazzzzzzy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Dyninst 小结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-09T13:51:52+08:00">
+                2017-10-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分析/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/10/09/dyninst/" class="leancloud_visitors" data-flag-title="Dyninst 小结">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p>Dyninst 学习暂时告一段落，学习的成果是为师兄做了一个二进制层面的静态插桩，之后也做了一些性能测试的工作。  </p>
+<h1 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h1><p>主要以代码形式讲解和记录：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="comment">//首先通过参数打开一个二进制文件</span></div><div class="line">    BPatch_addressSpace *app = bpatch-&gt;openBinary(argv[<span class="number">1</span>]);</div><div class="line">    <span class="keyword">if</span> (app == <span class="literal">NULL</span>)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//mgr 为patchAPI的主要操作对象</span></div><div class="line">    mgr = convert(app);</div><div class="line">    appImage = app-&gt;getImage();</div><div class="line">    <span class="function">Patcher <span class="title">patcher</span><span class="params">(mgr)</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">//获取modules和定义一个function的vector</span></div><div class="line">    <span class="built_in">vector</span>&lt;BPatch_module *&gt; *modules = appImage-&gt;getModules();</div><div class="line">    <span class="built_in">vector</span>&lt;BPatch_function *&gt; *functions;</div><div class="line">    </div><div class="line">    <span class="comment">//遍历所有modules，取出每一个modules的所有function</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = modules-&gt;begin(); it != modules-&gt;end(); ++it)</div><div class="line">    &#123;</div><div class="line">        BPatch_module * <span class="keyword">module</span> = *it;</div><div class="line">        functions = <span class="keyword">module</span>-&gt;getProcedures();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//对每个function进行插桩</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = functions-&gt;begin(); it != functions-&gt;end(); ++it)</div><div class="line">    &#123;</div><div class="line">        PatchFunction *func = convert(*it);</div><div class="line">        writeCanaryPoint(func);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//提交插桩结果，使插桩生效</span></div><div class="line">    patcher.commit();</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; pts.size() &lt;&lt; <span class="string">" inst points"</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line"></div><div class="line">    <span class="comment">//重写二进制文件</span></div><div class="line">    <span class="built_in">string</span> name = <span class="built_in">string</span>(argv[<span class="number">1</span>]);</div><div class="line">    finishInstrumenting(app, name.c_str());</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"Instrumentation Success!"</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">writeCanaryPoint</span><span class="params">(PatchFunction *func)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="comment">//取出function的所有basicblock</span></div><div class="line">    <span class="keyword">const</span> PatchFunction::Blockset &amp;blks = func-&gt;blocks();</div><div class="line">    <span class="keyword">char</span> bytes[<span class="number">1024</span>];</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = blks.begin(); it != blks.end(); it++)</div><div class="line">    &#123;</div><div class="line">        PatchBlock *block = *it;</div><div class="line">        PatchBlock::Insns insns;</div><div class="line">        block-&gt;getInsns(insns);</div><div class="line">        </div><div class="line">        <span class="keyword">char</span> date[] = <span class="string">"\x90\x64\x33\x00\x25\xa0\x02\x00\x00"</span>;</div><div class="line">        <span class="keyword">char</span> date_inst[] = <span class="string">"\x64\x33\x00\x25\xa0\x02\x00\x00"</span>;</div><div class="line">        <span class="comment">// 64 48 33 04 25 28 00 00 00 	xor    %fs:0x28,%rax</span></div><div class="line">        <span class="comment">//遍历basicblock的每一条指令，判断是否为 xor   %fs:0x28,%rax</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> j = insns.begin(); j != insns.end(); j++)</div><div class="line">        &#123;</div><div class="line">            <span class="comment">// get instruction bytes</span></div><div class="line">            Address addr = (*j).first;</div><div class="line">            Instruction::Ptr iptr = (*j).second;</div><div class="line">            <span class="keyword">size_t</span> nbytes = iptr-&gt;size();</div><div class="line">            assert(nbytes &lt; <span class="number">1024</span>);</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">size_t</span> i=<span class="number">0</span>; i&lt;nbytes; i++) &#123;</div><div class="line">                bytes[i] = iptr-&gt;rawByte(i);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            date[<span class="number">3</span>] = bytes[nbytes - <span class="number">6</span>];     <span class="comment">//raw byte about which register</span></div><div class="line">            date_inst[<span class="number">2</span>] = bytes[nbytes - <span class="number">6</span>];</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (isCheckCanary(bytes, nbytes))</div><div class="line">            &#123;</div><div class="line">                <span class="comment">//如果找到对应的指令，则将该指令的地址添加到insert point</span></div><div class="line">                mgr-&gt;findPoint(</div><div class="line">                    Location::InstructionInstance(func, block, addr),</div><div class="line">                    Point::PreInsn,</div><div class="line">                    back_inserter(pts));</div><div class="line">                </div><div class="line">                <span class="comment">//分两种情况选择重写不同的二进制代码</span></div><div class="line">                <span class="keyword">if</span> (nbytes == <span class="number">9</span>)</div><div class="line">                &#123;</div><div class="line">                    <span class="keyword">if</span> (!overwritePoint(pts.back(), date, <span class="number">9</span>))</div><div class="line">                    &#123;</div><div class="line">                        <span class="built_in">cout</span> &lt;&lt; <span class="string">"write error"</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">                        <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nbytes == <span class="number">8</span>) &#123;</div><div class="line">                    <span class="keyword">if</span> (!overwritePoint(pts.back(), date_inst, <span class="number">8</span>))</div><div class="line">                    &#123;</div><div class="line">                        <span class="built_in">cout</span> &lt;&lt; <span class="string">"write error"</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">                        <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="comment">//生成snippet，将snippet插入insert point</span></div><div class="line">                snippet =  MySnippet::create(<span class="keyword">new</span> MySnippet(bytes[nbytes - <span class="number">6</span>]));</div><div class="line">                InstancePtr instptr = pts.back()-&gt;pushBack(snippet);</div><div class="line">                <span class="keyword">if</span> (instptr == <span class="literal">NULL</span>)</div><div class="line">                &#123;</div><div class="line">                    <span class="built_in">cerr</span> &lt;&lt; <span class="string">"insert snipper error"</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">                    <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">finishInstrumenting</span><span class="params">(BPatch_addressSpace *app, <span class="keyword">const</span> <span class="keyword">char</span> *newName)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="comment">//首先类型转换</span></div><div class="line">    BPatch_binaryEdit *appBin = <span class="keyword">dynamic_cast</span>&lt;BPatch_binaryEdit *&gt;(app);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!appBin)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"appBin not defined!\n"</span>);</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// Write binary to file</span></div><div class="line">    <span class="keyword">if</span> (!appBin-&gt;writeFile(newName))</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"writeFile failed\n"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">bool</span> <span class="title">overwritePoint</span><span class="params">(Point *pt, <span class="keyword">char</span> *date, <span class="keyword">size_t</span> size)</span> </span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="comment">//overwrite xor    %fs:0x28,%rax</span></div><div class="line">    <span class="comment">//          xor    %fs:0x2a0,%eax</span></div><div class="line"></div><div class="line">    PatchBlock *block = pt-&gt;block();</div><div class="line">    ParseAPI::Block *b = block-&gt;block();</div><div class="line">    <span class="comment">//insert point addr</span></div><div class="line">    Offset off = pt-&gt;addr();</div><div class="line">    <span class="comment">// printf("overwritePoint : %2X\n", off);</span></div><div class="line">    </div><div class="line">    ParseAPI::SymtabCodeRegion *r = </div><div class="line">        <span class="keyword">dynamic_cast</span>&lt;ParseAPI::SymtabCodeRegion*&gt;(b-&gt;region());</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> (r == <span class="literal">NULL</span>)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"SymtabCodeRegion is null"</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//计算insert point和basicblock入口点的偏移</span></div><div class="line">    Offset region_off = (Offset)r-&gt;getPtrToInstruction(off) - </div><div class="line">                        (Offset)r-&gt;symRegion()-&gt;getPtrToRawData();</div><div class="line">    <span class="keyword">bool</span> success = <span class="literal">false</span>;</div><div class="line">    <span class="comment">//重写该二进制部分</span></div><div class="line">    <span class="comment">//region_off 偏移，date 写入的数据，size 大小</span></div><div class="line">    success = r-&gt;symRegion()-&gt;patchData(region_off, (<span class="keyword">void</span> *)date, size);</div><div class="line">    <span class="keyword">if</span> (!success)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"patchData is error"</span> &lt;&lt; <span class="built_in">endl</span>; </div><div class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>源文件地址<br><a href="https://github.com/jaguo/security/blob/master/canary/safeCanary.cpp" target="_blank" rel="external">safeCanary.cpp</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Dyninst/" rel="tag"># Dyninst</a>
+          
+            <a href="/tags/Static-Instrumentation/" rel="tag"># Static Instrumentation</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/15/SPEC_CPU2006/" rel="next" title="BenchMark SPEC CPU2006">
+                <i class="fa fa-chevron-left"></i> BenchMark SPEC CPU2006
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Guo" />
+          <p class="site-author-name" itemprop="name">Guo</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jaguo" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00"><span class="nav-number">1.</span> <span class="nav-text">0x00</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01"><span class="nav-number">2.</span> <span class="nav-text">0x01</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guo</span>
+</div>
+
+
+<div class="copyright">
+  由 Hexo 强力驱动
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("CPBg3p2IoXaVfjfo7ngq68Tz-gzGzoHsz", "tWWb9uc4rnpykF63DRsbTjjb");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
