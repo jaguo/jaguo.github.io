@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Lazzzzzzy">
 <meta property="og:description" content="0x00 背景最近在帮师兄做静态插桩，然后插桩的工作做得差不多了，需要用到benchmark做性能测试，简单记录一下SPEC CPU2006的安装和使用过程。中间也遇到了许多坑，谨记。   0x01 安装机器版本：Ubuntu 16.04.3 LTS首先下载CPU2006到本地，一般会下载到镜像文件，解压之后可以找到install.sh12345678910111213~$ ./install.s">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-15T09:15:49.642Z">
+<meta property="og:updated_time" content="2018-05-11T04:13:50.245Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BenchMark SPEC CPU2006">
 <meta name="twitter:description" content="0x00 背景最近在帮师兄做静态插桩，然后插桩的工作做得差不多了，需要用到benchmark做性能测试，简单记录一下SPEC CPU2006的安装和使用过程。中间也遇到了许多坑，谨记。   0x01 安装机器版本：Ubuntu 16.04.3 LTS首先下载CPU2006到本地，一般会下载到镜像文件，解压之后可以找到install.sh12345678910111213~$ ./install.s">
@@ -394,7 +394,7 @@
 <p>接着，输入以下命令可以切换版本<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">sudo update-alternatives --config gcc</div><div class="line">There are 2 choices <span class="keyword">for</span> the alternative gcc (providing /usr/bin/gcc).</div><div class="line"></div><div class="line">  Selection    Path              Priority   Status</div><div class="line">------------------------------------------------------------</div><div class="line">  0            /usr/bin/gcc-5     100       auto mode</div><div class="line">* 1            /usr/bin/gcc-4.9   50        manual mode</div><div class="line">  2            /usr/bin/gcc-5     100       manual mode</div><div class="line"></div><div class="line">Press &lt;enter&gt; to keep the current choice[*], or <span class="built_in">type</span> selection number:</div></pre></td></tr></table></figure></p>
 <p>如果有遇到g++也需要不同版本的问题，同样使用该办法来实现g++的切换。</p>
 <p>安装完成之后，如果没有问题，重新执行编译命令，便可以编译完成。</p>
-<h1 id="0x03-运行"><a href="#0x03-运行" class="headerlink" title="0x03 运行"></a>0x03 运行</h1><p>如果一切没有问题，接下来可以进行运行测试<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">runspec --config=my.cfg --T base --reportable int</div></pre></td></tr></table></figure></p>
+<h1 id="0x03-运行"><a href="#0x03-运行" class="headerlink" title="0x03 运行"></a>0x03 运行</h1><p>如果一切没有问题，接下来可以进行运行测试<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">runspec --config=my.cfg -T base --reportable int</div></pre></td></tr></table></figure></p>
 <p>如果需要生成报告，一定要写<code>--reportable</code>参数，运行该命令时，程序会自动检测编译生成的二进制文件有没有修改过，如果原来生成的二进制文件被修改了，则运行时会自动重新编译生成二进制文件，确保运行的程序是原始的程序。</p>
 <h1 id="0x04-运行插桩过后的程序"><a href="#0x04-运行插桩过后的程序" class="headerlink" title="0x04 运行插桩过后的程序"></a>0x04 运行插桩过后的程序</h1><p>因为运行时会检测程序是否是编译结束的程序，因此，就存在一个问题，插桩过的程序一定被修改了，如何运行，查阅了一些资料发现：  </p>
 <ul>
