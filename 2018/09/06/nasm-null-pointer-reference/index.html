@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="CVE," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="nasm null pointer dereferens版本号：nasm-2.14rc15漏洞描述：空指针的解引用编译命令：./nasm -f bin ./test.asm -o /dev/null运行时错误信息：error: EQU not preceded by label   poc1equ foo load core dump file123456&amp;lt;!--back trace--&amp;g">
+<meta name="keywords" content="CVE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nasm_null_pointer_reference">
+<meta property="og:url" content="https://jaguo.github.io/2018/09/06/nasm-null-pointer-reference/index.html">
+<meta property="og:site_name" content="Lazzzzzzy">
+<meta property="og:description" content="nasm null pointer dereferens版本号：nasm-2.14rc15漏洞描述：空指针的解引用编译命令：./nasm -f bin ./test.asm -o /dev/null运行时错误信息：error: EQU not preceded by label   poc1equ foo load core dump file123456&amp;lt;!--back trace--&amp;g">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-06T12:08:11.161Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nasm_null_pointer_reference">
+<meta name="twitter:description" content="nasm null pointer dereferens版本号：nasm-2.14rc15漏洞描述：空指针的解引用编译命令：./nasm -f bin ./test.asm -o /dev/null运行时错误信息：error: EQU not preceded by label   poc1equ foo load core dump file123456&amp;lt;!--back trace--&amp;g">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jaguo.github.io/2018/09/06/nasm-null-pointer-reference/"/>
+
+
+
+
+
+  <title>nasm_null_pointer_reference | Lazzzzzzy</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-75324188-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Lazzzzzzy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jaguo.github.io/2018/09/06/nasm-null-pointer-reference/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Guo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lazzzzzzy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">nasm_null_pointer_reference</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-06T20:05:33+08:00">
+                2018-09-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/漏洞挖掘/" itemprop="url" rel="index">
+                    <span itemprop="name">漏洞挖掘</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/09/06/nasm-null-pointer-reference/" class="leancloud_visitors" data-flag-title="nasm_null_pointer_reference">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="nasm-null-pointer-dereferens"><a href="#nasm-null-pointer-dereferens" class="headerlink" title="nasm null pointer dereferens"></a>nasm null pointer dereferens</h1><p>版本号：nasm-2.14rc15<br>漏洞描述：空指针的解引用<br>编译命令：./nasm -f bin ./test.asm -o /dev/null<br>运行时错误信息：error: EQU not preceded by label  </p>
+<h2 id="poc"><a href="#poc" class="headerlink" title="poc"></a>poc</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">equ foo</span><br></pre></td></tr></table></figure>
+<h1 id="load-core-dump-file"><a href="#load-core-dump-file" class="headerlink" title="load core dump file"></a>load core dump file</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--back trace--&gt;</span><br><span class="line">#0  0x000055d2360d042c in islocal (l=0x0) at asm/labels.c:64</span><br><span class="line">#1  0x000055d2360d067d in find_label (label=0x0, create=true, created=0x7ffd289d75c6) at asm/labels.c:222</span><br><span class="line">#2  0x000055d2360d0de5 in define_label (label=0x0, segment=-1, offset=0, normal=false) at asm/labels.c:441</span><br><span class="line">#3  0x000055d2360c4345 in assemble_file (fname=0x55d2374a7d60 &quot;./test.asm&quot;, depend_ptr=0x0) at asm/nasm.c:1484</span><br><span class="line">#4  0x000055d2360c25e5 in main (argc=6, argv=0x7ffd289d7948) at asm/nasm.c:566</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// asm/labels.c:64</span></span><br><span class="line">   <span class="number">59</span>     <span class="keyword">if</span> (tasm_compatible_mode) &#123;</span><br><span class="line">   <span class="number">60</span>         <span class="keyword">if</span> (l[<span class="number">0</span>] == <span class="string">'@'</span> &amp;&amp; l[<span class="number">1</span>] == <span class="string">'@'</span>)</span><br><span class="line">   <span class="number">61</span>             <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">   <span class="number">62</span>     &#125;</span><br><span class="line">   <span class="number">63</span> </span><br><span class="line"> ► <span class="number">64</span>     <span class="keyword">return</span> (l[<span class="number">0</span>] == <span class="string">'.'</span> &amp;&amp; l[<span class="number">1</span>] != <span class="string">'.'</span>);</span><br><span class="line">   <span class="number">65</span> &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--asm--&gt;</span><br><span class="line"> ► 0x55d2360d042c &lt;islocal+56&gt;    movzx  eax, byte ptr [rax]</span><br><span class="line">   0x55d2360d042f &lt;islocal+59&gt;    cmp    al, 0x2e</span><br><span class="line">   0x55d2360d0431 &lt;islocal+61&gt;    jne    islocal+85 &lt;0x55d2360d0449&gt;</span><br><span class="line">&lt;!--register--&gt;</span><br><span class="line">RAX 0x0</span><br></pre></td></tr></table></figure>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="简要分析"><a href="#简要分析" class="headerlink" title="简要分析"></a>简要分析</h2><p>程序发生崩溃在<code>islocal</code>函数中，根据backtrace和崩溃时寄存器信息可以看出，是发生了空指针解引用导致的程序崩溃。回退<code>find_label</code>函数，空指针由参数<code>label</code>传入。继续回退<code>define_label</code>，空指针同样由<code>label</code>参数传入。在函数<code>assemble_file</code>中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">define_label(output_ins.label,</span><br><span class="line">                output_ins.oprs[0].segment,</span><br><span class="line">                output_ins.oprs[0].offset, false);</span><br></pre></td></tr></table></figure></p>
+<p>函数的空指针由<code>output_ins.label</code>传入。而<code>output_ins</code>是<code>parse_line(pass1, line, &amp;output_ins);</code>所赋值的。<br>因此，在分析<code>label</code>是何时被赋值为空可以跟踪<code>parse_line</code>函数。</p>
+<h2 id="详细分析"><a href="#详细分析" class="headerlink" title="详细分析"></a>详细分析</h2><p>gdb 调试程序运行，<code>gdb ./nasm</code>进入gdb调试界面。对<code>assemble_file</code>下断点，运行命令<code>r -f bin ./test.asm -o /dev/null</code>继续运行。<br>添加<code>watchpoint</code>，观察<code>line</code>变量的使用情况，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">► 1435         while ((line = preproc-&gt;getline())) &#123;</span><br><span class="line">   1436             if (++globallineno &gt; nasm_limit[LIMIT_LINES])</span><br><span class="line">   1437                 nasm_fatal(0,</span><br><span class="line">   1438                            &quot;overall line count exceeds the maximum %&quot;PRId64&quot;\n&quot;,</span><br><span class="line">   1439                            nasm_limit[LIMIT_LINES]);</span><br><span class="line">   1440 </span><br><span class="line"></span><br><span class="line">-&gt; $ p line</span><br><span class="line">$1 = 0x5555559248d0 &quot;equ foo&quot;</span><br></pre></td></tr></table></figure></p>
+<p>该变量<code>line</code>读入的内容为输入文件中的符合要求的一行内容。<br><code>b parse_line</code>函数，进入该函数查看函数。<code>watch result-&gt;label</code>查看<code>label</code>在什么时候被修改，在第一次被修改时：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">► 452     result-&gt;eops        = NULL; /* must do this, whatever happens */</span><br></pre></td></tr></table></figure></p>
+<p>之后就直接退出了<code>parse_line</code>函数，因此，在该函数中<code>label</code>只是被赋值了初始值NULL。<br>继续执行，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">  1475             /*  forw_ref */</span><br><span class="line">  1476             if (output_ins.opcode == I_EQU) &#123;</span><br><span class="line">► 1477                 if (!output_ins.label)</span><br><span class="line">  1478                     nasm_error(ERR_NONFATAL,</span><br><span class="line">  1479                                &quot;EQU not preceded by label&quot;);</span><br><span class="line">  1480 </span><br><span class="line">  1481                 if (output_ins.operands == 1 &amp;&amp;</span><br><span class="line">  1482                     (output_ins.oprs[0].type &amp; IMMEDIATE) &amp;&amp;</span><br><span class="line">  1483                     output_ins.oprs[0].wrt == NO_SEG) &#123;</span><br><span class="line">  1484                     define_label(output_ins.label,</span><br><span class="line">  1485                                  output_ins.oprs[0].segment,</span><br><span class="line">  1486                                  output_ins.oprs[0].offset, false);</span><br></pre></td></tr></table></figure></p>
+<p>由于<code>output_ins.opcode == I_EQU</code>成立，在poc中语句为<code>EQU foo</code>，因此会被解析为<code>EQU</code>，所以会直接进入<code>define_label</code>函数中，但是由于<code>label</code>没有任何信息，在后续的处理中会引起null pointer dereference错误。</p>
+<h2 id="parse-line"><a href="#parse-line" class="headerlink" title="parse_line"></a>parse_line</h2><ul>
+<li>当poc为<code>equ &quot;foo&quot;</code>时，<code>i = stdscan(NULL, &amp;tokval);</code>取出的值为<code>263 == TOKEN_INSN</code>。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   equ                &quot;foo&quot;</span><br><span class="line">    ^                   ^</span><br><span class="line">    |                   |</span><br><span class="line">TOKEN_INSN          TOKEN_STR</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (i == TOKEN_ID || (insn_is_label &amp;&amp; i == TOKEN_INSN)) &#123;</span><br><span class="line">    /* there&apos;s a label here */</span><br><span class="line">    first = false;</span><br><span class="line">    result-&gt;label = tokval.t_charptr;</span><br><span class="line">    i = stdscan(NULL, &amp;tokval);</span><br></pre></td></tr></table></figure>
+<p>该分支不能得到满足，因此label的值为默认初始化值<code>NULL</code>。  </p>
+<ul>
+<li><p>当poc 为<code>label: equ &quot;foo&quot;</code>时，<code>i = stdscan(NULL, &amp;tokval);</code>取出的值为<code>256 == TOKEN_ID</code>。<br><code>result-&gt;label</code>应赋值为label，  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">label:                 equ                &quot;foo&quot;</span><br><span class="line">  ^                     ^                   ^</span><br><span class="line">  |                     |                   |</span><br><span class="line">label(TOKEN_ID)     TOKEN_INSN          TOKEN_STR</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当poc为<code>a equ 0xff</code>时，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">  a              equ                0xff</span><br><span class="line">  ^               ^                   ^</span><br><span class="line">  |               |                   |</span><br><span class="line">label         TOKEN_INSN          immediate</span><br><span class="line">(TOKEN_ID)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="小节"><a href="#小节" class="headerlink" title="小节"></a>小节</h1><p>crash产生的原因是因为，当解析<code>EQU</code>命令时，如果在<code>EQU</code>之前没有非指令字符时，在<code>parser.c#470</code>位置，会导致没有条件成立，不能进入<code>if</code>语句，因此在处理<code>result-&gt;label</code>时，所返回的值为默认初始化的值，即<code>result-&gt;label = NULL</code>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CVE/" rel="tag"># CVE</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/26/lava-install/" rel="next" title="lava_install">
+                <i class="fa fa-chevron-left"></i> lava_install
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Guo" />
+          <p class="site-author-name" itemprop="name">Guo</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jaguo" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#nasm-null-pointer-dereferens"><span class="nav-number">1.</span> <span class="nav-text">nasm null pointer dereferens</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#poc"><span class="nav-number">1.1.</span> <span class="nav-text">poc</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#load-core-dump-file"><span class="nav-number">2.</span> <span class="nav-text">load core dump file</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分析"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简要分析"><span class="nav-number">3.1.</span> <span class="nav-text">简要分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#详细分析"><span class="nav-number">3.2.</span> <span class="nav-text">详细分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#parse-line"><span class="nav-number">3.3.</span> <span class="nav-text">parse_line</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小节"><span class="nav-number">4.</span> <span class="nav-text">小节</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guo</span>
+</div>
+
+
+<div class="copyright">
+  由 Hexo 强力驱动
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("CPBg3p2IoXaVfjfo7ngq68Tz-gzGzoHsz", "tWWb9uc4rnpykF63DRsbTjjb");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
