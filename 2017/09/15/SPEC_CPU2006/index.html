@@ -99,10 +99,10 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="BenchMark SPEC CPU2006">
 <meta property="og:url" content="https://jaguo.github.io/2017/09/15/SPEC_CPU2006/index.html">
-<meta property="og:site_name" content="Lazzzzzzy">
+<meta property="og:site_name" content="Lazzzy">
 <meta property="og:description" content="0x00 背景最近在帮师兄做静态插桩，然后插桩的工作做得差不多了，需要用到benchmark做性能测试，简单记录一下SPEC CPU2006的安装和使用过程。中间也遇到了许多坑，谨记。   0x01 安装机器版本：Ubuntu 16.04.3 LTS首先下载CPU2006到本地，一般会下载到镜像文件，解压之后可以找到install.sh12345678910111213~$ ./install.s">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-16T06:32:21.113Z">
+<meta property="og:updated_time" content="2018-12-10T08:53:29.861Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BenchMark SPEC CPU2006">
 <meta name="twitter:description" content="0x00 背景最近在帮师兄做静态插桩，然后插桩的工作做得差不多了，需要用到benchmark做性能测试，简单记录一下SPEC CPU2006的安装和使用过程。中间也遇到了许多坑，谨记。   0x01 安装机器版本：Ubuntu 16.04.3 LTS首先下载CPU2006到本地，一般会下载到镜像文件，解压之后可以找到install.sh12345678910111213~$ ./install.s">
@@ -114,7 +114,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":true},
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: true,
@@ -140,11 +140,20 @@
 
 
 
-  <title>BenchMark SPEC CPU2006 | Lazzzzzzy</title>
+  <title>BenchMark SPEC CPU2006 | Lazzzy</title>
   
 
 
 
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-75324188-1', 'auto');
+  ga('send', 'pageview');
+</script>
 
 
 
@@ -176,7 +185,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Lazzzzzzy</span>
+        <span class="site-title">Lazzzy</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -217,6 +226,16 @@
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -282,7 +301,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lazzzzzzy">
+      <meta itemprop="name" content="Lazzzy">
     </span>
 
     
@@ -342,6 +361,17 @@
 
           
           
+             <span id="/2017/09/15/SPEC_CPU2006/" class="leancloud_visitors" data-flag-title="BenchMark SPEC CPU2006">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
 
           
 
@@ -374,7 +404,7 @@
 <p>接着，输入以下命令可以切换版本<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo update-alternatives --config gcc</span><br><span class="line">There are 2 choices <span class="keyword">for</span> the alternative gcc (providing /usr/bin/gcc).</span><br><span class="line"></span><br><span class="line">  Selection    Path              Priority   Status</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">  0            /usr/bin/gcc-5     100       auto mode</span><br><span class="line">* 1            /usr/bin/gcc-4.9   50        manual mode</span><br><span class="line">  2            /usr/bin/gcc-5     100       manual mode</span><br><span class="line"></span><br><span class="line">Press &lt;enter&gt; to keep the current choice[*], or <span class="built_in">type</span> selection number:</span><br></pre></td></tr></table></figure></p>
 <p>如果有遇到g++也需要不同版本的问题，同样使用该办法来实现g++的切换。</p>
 <p>安装完成之后，如果没有问题，重新执行编译命令，便可以编译完成。</p>
-<h1 id="0x03-运行"><a href="#0x03-运行" class="headerlink" title="0x03 运行"></a>0x03 运行</h1><p>如果一切没有问题，接下来可以进行运行测试<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runspec --config=my.cfg --T base --reportable int</span><br></pre></td></tr></table></figure></p>
+<h1 id="0x03-运行"><a href="#0x03-运行" class="headerlink" title="0x03 运行"></a>0x03 运行</h1><p>如果一切没有问题，接下来可以进行运行测试<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runspec --config=my.cfg -T base --reportable int</span><br></pre></td></tr></table></figure></p>
 <p>如果需要生成报告，一定要写<code>--reportable</code>参数，运行该命令时，程序会自动检测编译生成的二进制文件有没有修改过，如果原来生成的二进制文件被修改了，则运行时会自动重新编译生成二进制文件，确保运行的程序是原始的程序。</p>
 <h1 id="0x04-运行插桩过后的程序"><a href="#0x04-运行插桩过后的程序" class="headerlink" title="0x04 运行插桩过后的程序"></a>0x04 运行插桩过后的程序</h1><p>因为运行时会检测程序是否是编译结束的程序，因此，就存在一个问题，插桩过的程序一定被修改了，如何运行，查阅了一些资料发现：  </p>
 <ul>
@@ -426,8 +456,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/09/06/nasm-null-pointer-reference/" rel="prev" title="nasm_null_pointer_reference">
-                nasm_null_pointer_reference <i class="fa fa-chevron-right"></i>
+              <a href="/2017/10/09/dyninst/" rel="prev" title="Dyninst 小结">
+                Dyninst 小结 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -475,8 +505,6 @@
 
   <aside id="sidebar" class="sidebar">
     
-      <div id="sidebar-dimmer"></div>
-    
     <div class="sidebar-inner">
 
       
@@ -507,7 +535,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -518,7 +546,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">1</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -529,7 +557,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -600,7 +628,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -742,6 +770,113 @@
 
 
   
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("CPBg3p2IoXaVfjfo7ngq68Tz-gzGzoHsz", "tWWb9uc4rnpykF63DRsbTjjb");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
 
   
 
