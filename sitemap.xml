@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jaguo.github.io/2019/03/01/nasm-2-14-segment-fault/</loc>
+    
+    <lastmod>2019-03-01T13:00:12.396Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://jaguo.github.io/2019/03/01/nasm-2-14-null-pointer-dereferens/</loc>
+    
+    <lastmod>2019-03-01T12:58:45.719Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jaguo.github.io/2019/02/28/docker-permission/</loc>
     
     <lastmod>2019-02-28T11:03:26.525Z</lastmod>
@@ -37,14 +51,14 @@
   </url>
   
   <url>
-    <loc>https://jaguo.github.io/2017/09/15/SPEC_CPU2006/</loc>
+    <loc>https://jaguo.github.io/2017/10/09/dyninst/</loc>
     
     <lastmod>2018-12-10T08:53:29.861Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://jaguo.github.io/2017/10/09/dyninst/</loc>
+    <loc>https://jaguo.github.io/2017/09/15/SPEC_CPU2006/</loc>
     
     <lastmod>2018-12-10T08:53:29.861Z</lastmod>
     

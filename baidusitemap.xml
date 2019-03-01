@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://jaguo.github.io/2019/03/01/nasm-2-14-segment-fault/</loc>
+    <lastmod>2019-03-01</lastmod>
+  </url>  <url>
+    <loc>https://jaguo.github.io/2019/03/01/nasm-2-14-null-pointer-dereferens/</loc>
+    <lastmod>2019-03-01</lastmod>
+  </url>  <url>
     <loc>https://jaguo.github.io/2019/02/28/docker-permission/</loc>
     <lastmod>2019-02-28</lastmod>
   </url>  <url>
@@ -13,10 +19,10 @@
     <loc>https://jaguo.github.io/2018/05/30/kernel_%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</loc>
     <lastmod>2018-12-10</lastmod>
   </url>  <url>
-    <loc>https://jaguo.github.io/2017/09/15/SPEC_CPU2006/</loc>
+    <loc>https://jaguo.github.io/2017/10/09/dyninst/</loc>
     <lastmod>2018-12-10</lastmod>
   </url>  <url>
-    <loc>https://jaguo.github.io/2017/10/09/dyninst/</loc>
+    <loc>https://jaguo.github.io/2017/09/15/SPEC_CPU2006/</loc>
     <lastmod>2018-12-10</lastmod>
   </url>  <url>
     <loc>https://jaguo.github.io/2018/01/22/ELF-No-software-breakpoints/</loc>
