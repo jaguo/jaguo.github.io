@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://jaguo.github.io/2019/03/01/qemu-%E8%B0%83%E8%AF%95%E5%86%85%E6%A0%B8/</loc>
+    <lastmod>2019-03-01</lastmod>
+  </url>  <url>
     <loc>https://jaguo.github.io/2019/03/01/nasm-2-14-segment-fault/</loc>
     <lastmod>2019-03-01</lastmod>
   </url>  <url>

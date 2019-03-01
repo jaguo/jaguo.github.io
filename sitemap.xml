@@ -2,16 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jaguo.github.io/2019/03/01/qemu-%E8%B0%83%E8%AF%95%E5%86%85%E6%A0%B8/</loc>
+    
+    <lastmod>2019-03-01T13:13:34.221Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jaguo.github.io/2019/03/01/nasm-2-14-segment-fault/</loc>
     
-    <lastmod>2019-03-01T13:00:12.396Z</lastmod>
+    <lastmod>2019-03-01T13:13:33.269Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://jaguo.github.io/2019/03/01/nasm-2-14-null-pointer-dereferens/</loc>
     
-    <lastmod>2019-03-01T12:58:45.719Z</lastmod>
+    <lastmod>2019-03-01T13:13:31.293Z</lastmod>
     
   </url>
   
