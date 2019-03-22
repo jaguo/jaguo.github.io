@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jaguo.github.io/2019/03/22/Shellcode-exit-normally/</loc>
+    
+    <lastmod>2019-03-22T05:56:15.763Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jaguo.github.io/about/index.html</loc>
     
     <lastmod>2019-03-05T14:49:32.497Z</lastmod>
